@@ -33,7 +33,7 @@ library(tidyverse)
     ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
     ## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
     ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.0.2     
+    ## ✔ purrr     1.0.4     
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
@@ -118,49 +118,61 @@ maxdeaths %>%
     ## 5 YES             3     1
     ## 6 YES             5     1
 
+``` r
+total_deaths <- deaths %>%
+  filter(tolower(Died) == "yes") %>%
+  nrow()
 
-Get the data into a format where the five columns for Death\[1-5\] are
-replaced by two columns: Time, and Death. Time should be a number
-between 1 and 5 (look into the function `parse_number`); Death is a
-categorical variables with values “yes”, “no” and ““. Call the resulting
-data set `deaths`.
+total_deaths
+```
 
-Similarly, deal with the returns of characters.
+    ## [1] 89
 
-Based on these datasets calculate the average number of deaths an
-Avenger suffers.
 
-## Individually
+    Get the data into a format where the five columns for Death[1-5] are replaced by two columns: Time, and Death. Time should be a number between 1 and 5 (look into the function `parse_number`); Death is a categorical variables with values "yes", "no" and "". Call the resulting data set `deaths`. 
 
-For each team member, copy this part of the report.
+    Similarly, deal with the returns of characters.
 
-Each team member picks one of the statements in the FiveThirtyEight
-[analysis](https://fivethirtyeight.com/features/avengers-death-comics-age-of-ultron/)
-and fact checks it based on the data. Use dplyr functionality whenever
-possible.
+    Based on these datasets calculate the average number of deaths an Avenger suffers. 
 
-### FiveThirtyEight Statement
+    ## Individually
 
-> Quote the statement you are planning to fact-check. Questions we can
-> pick from 1. “Out of 173 listed Avengers, my analysis found that 69
-> had died at least one time after they joined the team.” 2. “Jocasta —
-> an android based on Janet van Dyne and built by Ultron — has been
-> destroyed five times and then recovered five times.” 3. “On 57
-> occasions the individual made a comeback.” 4.
+    For each team member, copy this part of the report. 
 
-Tirmidi Mohamed: “”
+    Each team member picks one of the statements in the FiveThirtyEight [analysis](https://fivethirtyeight.com/features/avengers-death-comics-age-of-ultron/) and fact checks it based on the data. Use dplyr functionality whenever possible.
 
-### Include the code
+    ### FiveThirtyEight Statement
 
-Make sure to include the code to derive the (numeric) fact for the
-statement
+    > Quote the statement you are planning to fact-check.
+    Questions we can pick from 
+    1. "Out of 173 listed Avengers, my analysis found that 69 had died at least one time after they joined the team."
+    2. "Jocasta — an android based on Janet van Dyne and built by Ultron — has been destroyed five times and then recovered five times."
+    3. "On 57 occasions the individual made a comeback."
+    4. "I counted 89 total deaths."
 
-Tirmidi’s code -
+    Tirmidi Mohamed: Question: "I counted 89 total deaths."
+
+    ### Include the code
+
+    Make sure to include the code to derive the (numeric) fact for the statement
+
+    Tirmidi's code -
+
+    ``` r
+    total_deaths <- deaths %>%
+      filter(tolower(Died) == "yes") %>%
+      nrow()
+
+    total_deaths
+
+    ## [1] 89
 
 ### Include your answer
 
 Include at least one sentence discussing the result of your
-fact-checking endeavor.
+fact-checking endeavor. **Tirmidi’s answer** - The statement that there
+were a total of 89 deaths is true. I was able to check by tallying up
+all the yes for deaths and it adds up to 89 so this is true.
 
 Upload your changes to the repository. Discuss and refine answers as a
 team.

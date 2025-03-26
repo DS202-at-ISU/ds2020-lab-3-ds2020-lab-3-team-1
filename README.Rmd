@@ -66,6 +66,12 @@ maxdeaths %>%
   group_by(Died, total_death) %>%
   tally()
 
+total_deaths <- deaths %>%
+  filter(tolower(Died) == "yes") %>%
+  nrow()
+
+total_deaths
+
 ```
 ```
 
@@ -90,16 +96,24 @@ Questions we can pick from
 3. "On 57 occasions the individual made a comeback."
 4. "I counted 89 total deaths."
 
-Tirmidi Mohamed: ""
+Tirmidi Mohamed: Question: "I counted 89 total deaths."
 
 ### Include the code
 
 Make sure to include the code to derive the (numeric) fact for the statement
 
 Tirmidi's code -
+```{r}
+total_deaths <- deaths %>%
+  filter(tolower(Died) == "yes") %>%
+  nrow()
 
+total_deaths
+```
 ### Include your answer
 
 Include at least one sentence discussing the result of your fact-checking endeavor.
+**Tirmidi's answer**
+ - The statement that there were a total of 89 deaths is true. I was able to check by tallying up all the yes for deaths and it adds up to 89 so this is true.
 
 Upload your changes to the repository. Discuss and refine answers as a team.
