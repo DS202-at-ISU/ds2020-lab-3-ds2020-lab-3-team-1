@@ -33,7 +33,7 @@ library(tidyverse)
     ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
     ## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
     ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.0.4     
+    ## ✔ purrr     1.0.2     
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
@@ -43,51 +43,81 @@ library(tidyverse)
 # Read the data
 av <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv", stringsAsFactors = FALSE)
 
-
-deaths <- av %>%
-  select(Name.Alias, starts_with("Death")) %>%
-  pivot_longer(cols = starts_with("Death"),
-               names_to = "Time",
-               names_prefix = "Death",
-               values_to = "Death") %>%
-  mutate(Time = parse_number(Time),
-         Death = ifelse(Death == "", NA, Death)) 
-
-head(deaths)
+library(tidyverse)
+av %>% 
+  select(
+    Name.Alias,
+    starts_with("Death")
+  ) %>% 
+  head()
 ```
 
-    ## # A tibble: 6 × 3
-    ##   Name.Alias                     Time Death
-    ##   <chr>                         <dbl> <chr>
-    ## 1 "Henry Jonathan \"Hank\" Pym"     1 YES  
-    ## 2 "Henry Jonathan \"Hank\" Pym"     2 <NA> 
-    ## 3 "Henry Jonathan \"Hank\" Pym"     3 <NA> 
-    ## 4 "Henry Jonathan \"Hank\" Pym"     4 <NA> 
-    ## 5 "Henry Jonathan \"Hank\" Pym"     5 <NA> 
-    ## 6 "Janet van Dyne"                  1 YES
+    ##                    Name.Alias Death1 Death2 Death3 Death4 Death5
+    ## 1   Henry Jonathan "Hank" Pym    YES                            
+    ## 2              Janet van Dyne    YES                            
+    ## 3 Anthony Edward "Tony" Stark    YES                            
+    ## 4         Robert Bruce Banner    YES                            
+    ## 5                Thor Odinson    YES    YES                     
+    ## 6      Richard Milhouse Jones     NO
 
 ``` r
-returns <- av %>%
-  select(Name.Alias, starts_with("Return")) %>%
-  pivot_longer(cols = starts_with("Return"),
-               names_to = "Time",
-               names_prefix = "Return",
-               values_to = "Return") %>%
-  mutate(Time = parse_number(Time),
-         Return = ifelse(Return == "", NA, Return)) 
+deaths <- av %>% 
+  pivot_longer(
+    starts_with("Death"),
+    names_to = "Time",
+    values_to = "Died"
+  ) %>%
+  select(
+    URL, Name.Alias, Time, Died
+  )
 
-head(returns)
+maxdeaths <- deaths %>% 
+  mutate(
+    Time = parse_number(Time)
+  ) %>% 
+  group_by(URL, Died) %>% 
+  summarise(
+    total_death = max(Time)
+  ) %>%
+  filter(Died != "")
+```
+
+    ## `summarise()` has grouped output by 'URL'. You can override using the `.groups`
+    ## argument.
+
+``` r
+maxdeaths %>% 
+  ungroup() %>% 
+  count(Died, total_death)
 ```
 
     ## # A tibble: 6 × 3
-    ##   Name.Alias                     Time Return
-    ##   <chr>                         <dbl> <chr> 
-    ## 1 "Henry Jonathan \"Hank\" Pym"     1 NO    
-    ## 2 "Henry Jonathan \"Hank\" Pym"     2 <NA>  
-    ## 3 "Henry Jonathan \"Hank\" Pym"     3 <NA>  
-    ## 4 "Henry Jonathan \"Hank\" Pym"     4 <NA>  
-    ## 5 "Henry Jonathan \"Hank\" Pym"     5 <NA>  
-    ## 6 "Janet van Dyne"                  1 YES
+    ##   Died  total_death     n
+    ##   <chr>       <dbl> <int>
+    ## 1 NO              1   104
+    ## 2 NO              2     1
+    ## 3 YES             1    53
+    ## 4 YES             2    14
+    ## 5 YES             3     1
+    ## 6 YES             5     1
+
+``` r
+maxdeaths %>%
+  group_by(Died, total_death) %>%
+  tally()
+```
+
+    ## # A tibble: 6 × 3
+    ## # Groups:   Died [2]
+    ##   Died  total_death     n
+    ##   <chr>       <dbl> <int>
+    ## 1 NO              1   104
+    ## 2 NO              2     1
+    ## 3 YES             1    53
+    ## 4 YES             2    14
+    ## 5 YES             3     1
+    ## 6 YES             5     1
+
 
 Get the data into a format where the five columns for Death\[1-5\] are
 replaced by two columns: Time, and Death. Time should be a number
