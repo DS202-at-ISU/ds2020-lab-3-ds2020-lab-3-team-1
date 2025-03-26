@@ -111,12 +111,21 @@ possible.
 
 ### FiveThirtyEight Statement
 
-> Quote the statement you are planning to fact-check.
+> Quote the statement you are planning to fact-check. Questions we can
+> pick from 1. “Out of 173 listed Avengers, my analysis found that 69
+> had died at least one time after they joined the team.” 2. “Jocasta —
+> an android based on Janet van Dyne and built by Ultron — has been
+> destroyed five times and then recovered five times.” 3. “On 57
+> occasions the individual made a comeback.” 4.
+
+Tirmidi Mohamed: “”
 
 ### Include the code
 
 Make sure to include the code to derive the (numeric) fact for the
 statement
+
+Tirmidi’s code -
 
 ### Include your answer
 
