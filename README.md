@@ -148,7 +148,6 @@ total_deaths
     1. "Out of 173 listed Avengers, my analysis found that 69 had died at least one time after they joined the team."
     2. "Jocasta — an android based on Janet van Dyne and built by Ultron — has been destroyed five times and then recovered five times."
     3. "On 57 occasions the individual made a comeback."
-    4. "I counted 89 total deaths."
 
     Tirmidi Mohamed: Question: "I counted 89 total deaths."
 
@@ -166,6 +165,12 @@ total_deaths
     total_deaths
 
     ## [1] 89
+
+Next students code -
+
+Next students code -
+
+Next students code -
 
 ### Include your answer
 
