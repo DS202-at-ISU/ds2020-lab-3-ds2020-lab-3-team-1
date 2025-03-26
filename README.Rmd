@@ -62,13 +62,10 @@ maxdeaths %>%
   ungroup() %>% 
   count(Died, total_death)
 
-<<<<<<< HEAD
-=======
 maxdeaths %>%
   group_by(Died, total_death) %>%
   tally()
 
->>>>>>> 709510b4c085bfdab7305e86016bd8090bf1ceaa
 ```
 ```
 
