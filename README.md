@@ -1,4 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/orjN5TIA)
 
 <!-- README.md is generated from README.Rmd. Please edit the README.Rmd file -->
 
@@ -26,45 +25,69 @@ Extract from the data below two data sets in long form `deaths` and
 `returns`
 
 ``` r
-av <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv", stringsAsFactors = FALSE)
-head(av)
+library(tidyverse)
 ```
 
-    ##                                                       URL
-    ## 1           http://marvel.wikia.com/Henry_Pym_(Earth-616)
-    ## 2      http://marvel.wikia.com/Janet_van_Dyne_(Earth-616)
-    ## 3       http://marvel.wikia.com/Anthony_Stark_(Earth-616)
-    ## 4 http://marvel.wikia.com/Robert_Bruce_Banner_(Earth-616)
-    ## 5        http://marvel.wikia.com/Thor_Odinson_(Earth-616)
-    ## 6       http://marvel.wikia.com/Richard_Jones_(Earth-616)
-    ##                    Name.Alias Appearances Current. Gender Probationary.Introl
-    ## 1   Henry Jonathan "Hank" Pym        1269      YES   MALE                    
-    ## 2              Janet van Dyne        1165      YES FEMALE                    
-    ## 3 Anthony Edward "Tony" Stark        3068      YES   MALE                    
-    ## 4         Robert Bruce Banner        2089      YES   MALE                    
-    ## 5                Thor Odinson        2402      YES   MALE                    
-    ## 6      Richard Milhouse Jones         612      YES   MALE                    
-    ##   Full.Reserve.Avengers.Intro Year Years.since.joining Honorary Death1 Return1
-    ## 1                      Sep-63 1963                  52     Full    YES      NO
-    ## 2                      Sep-63 1963                  52     Full    YES     YES
-    ## 3                      Sep-63 1963                  52     Full    YES     YES
-    ## 4                      Sep-63 1963                  52     Full    YES     YES
-    ## 5                      Sep-63 1963                  52     Full    YES     YES
-    ## 6                      Sep-63 1963                  52 Honorary     NO        
-    ##   Death2 Return2 Death3 Return3 Death4 Return4 Death5 Return5
-    ## 1                                                            
-    ## 2                                                            
-    ## 3                                                            
-    ## 4                                                            
-    ## 5    YES      NO                                             
-    ## 6                                                            
-    ##                                                                                                                                                                              Notes
-    ## 1                                                                                                                Merged with Ultron in Rage of Ultron Vol. 1. A funeral was held. 
-    ## 2                                                                                                  Dies in Secret Invasion V1:I8. Actually was sent tto Microverse later recovered
-    ## 3 Death: "Later while under the influence of Immortus Stark committed a number of horrible acts and was killed.'  This set up young Tony. Franklin Richards later brought him back
-    ## 4                                                                               Dies in Ghosts of the Future arc. However "he had actually used a hidden Pantheon base to survive"
-    ## 5                                                      Dies in Fear Itself brought back because that's kind of the whole point. Second death in Time Runs Out has not yet returned
-    ## 6                                                                                                                                                                             <NA>
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+    ## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+    ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+    ## ✔ purrr     1.0.4     
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
+# Read the data
+av <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv", stringsAsFactors = FALSE)
+
+
+deaths <- av %>%
+  select(Name.Alias, starts_with("Death")) %>%
+  pivot_longer(cols = starts_with("Death"),
+               names_to = "Time",
+               names_prefix = "Death",
+               values_to = "Death") %>%
+  mutate(Time = parse_number(Time),
+         Death = ifelse(Death == "", NA, Death)) 
+
+head(deaths)
+```
+
+    ## # A tibble: 6 × 3
+    ##   Name.Alias                     Time Death
+    ##   <chr>                         <dbl> <chr>
+    ## 1 "Henry Jonathan \"Hank\" Pym"     1 YES  
+    ## 2 "Henry Jonathan \"Hank\" Pym"     2 <NA> 
+    ## 3 "Henry Jonathan \"Hank\" Pym"     3 <NA> 
+    ## 4 "Henry Jonathan \"Hank\" Pym"     4 <NA> 
+    ## 5 "Henry Jonathan \"Hank\" Pym"     5 <NA> 
+    ## 6 "Janet van Dyne"                  1 YES
+
+``` r
+returns <- av %>%
+  select(Name.Alias, starts_with("Return")) %>%
+  pivot_longer(cols = starts_with("Return"),
+               names_to = "Time",
+               names_prefix = "Return",
+               values_to = "Return") %>%
+  mutate(Time = parse_number(Time),
+         Return = ifelse(Return == "", NA, Return)) 
+
+head(returns)
+```
+
+    ## # A tibble: 6 × 3
+    ##   Name.Alias                     Time Return
+    ##   <chr>                         <dbl> <chr> 
+    ## 1 "Henry Jonathan \"Hank\" Pym"     1 NO    
+    ## 2 "Henry Jonathan \"Hank\" Pym"     2 <NA>  
+    ## 3 "Henry Jonathan \"Hank\" Pym"     3 <NA>  
+    ## 4 "Henry Jonathan \"Hank\" Pym"     4 <NA>  
+    ## 5 "Henry Jonathan \"Hank\" Pym"     5 <NA>  
+    ## 6 "Janet van Dyne"                  1 YES
 
 Get the data into a format where the five columns for Death\[1-5\] are
 replaced by two columns: Time, and Death. Time should be a number

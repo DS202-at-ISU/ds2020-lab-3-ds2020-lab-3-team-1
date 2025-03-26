@@ -25,8 +25,35 @@ Submit a link to your repository on Canvas (only one submission per team) to sig
 Extract from the data below two data sets in long form `deaths` and `returns`
 
 ```{r}
+library(tidyverse)
+
+# Read the data
 av <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv", stringsAsFactors = FALSE)
-head(av)
+
+
+deaths <- av %>%
+  select(Name.Alias, starts_with("Death")) %>%
+  pivot_longer(cols = starts_with("Death"),
+               names_to = "Time",
+               names_prefix = "Death",
+               values_to = "Death") %>%
+  mutate(Time = parse_number(Time),
+         Death = ifelse(Death == "", NA, Death)) 
+
+head(deaths)
+
+returns <- av %>%
+  select(Name.Alias, starts_with("Return")) %>%
+  pivot_longer(cols = starts_with("Return"),
+               names_to = "Time",
+               names_prefix = "Return",
+               values_to = "Return") %>%
+  mutate(Time = parse_number(Time),
+         Return = ifelse(Return == "", NA, Return)) 
+
+head(returns)
+
+
 ```
 
 Get the data into a format where the five columns for Death[1-5] are replaced by two columns: Time, and Death. Time should be a number between 1 and 5 (look into the function `parse_number`); Death is a categorical variables with values "yes", "no" and "". Call the resulting data set `deaths`. 
