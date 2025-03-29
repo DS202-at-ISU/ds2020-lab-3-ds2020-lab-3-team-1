@@ -33,7 +33,7 @@ library(tidyverse)
     ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
     ## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
     ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.0.4     
+    ## ✔ purrr     1.0.2     
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
@@ -43,7 +43,6 @@ library(tidyverse)
 # Read the data
 av <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv", stringsAsFactors = FALSE)
 
-library(tidyverse)
 av %>% 
   select(
     Name.Alias,
@@ -70,53 +69,65 @@ deaths <- av %>%
   select(
     URL, Name.Alias, Time, Died
   )
-
-maxdeaths <- deaths %>% 
-  mutate(
-    Time = parse_number(Time)
-  ) %>% 
-  group_by(URL, Died) %>% 
-  summarise(
-    total_death = max(Time)
-  ) %>%
-  filter(Died != "")
+head(deaths)
 ```
 
-    ## `summarise()` has grouped output by 'URL'. You can override using the `.groups`
-    ## argument.
+    ## # A tibble: 6 × 4
+    ##   URL                                                Name.Alias      Time  Died 
+    ##   <chr>                                              <chr>           <chr> <chr>
+    ## 1 http://marvel.wikia.com/Henry_Pym_(Earth-616)      "Henry Jonatha… Deat… "YES"
+    ## 2 http://marvel.wikia.com/Henry_Pym_(Earth-616)      "Henry Jonatha… Deat… ""   
+    ## 3 http://marvel.wikia.com/Henry_Pym_(Earth-616)      "Henry Jonatha… Deat… ""   
+    ## 4 http://marvel.wikia.com/Henry_Pym_(Earth-616)      "Henry Jonatha… Deat… ""   
+    ## 5 http://marvel.wikia.com/Henry_Pym_(Earth-616)      "Henry Jonatha… Deat… ""   
+    ## 6 http://marvel.wikia.com/Janet_van_Dyne_(Earth-616) "Janet van Dyn… Deat… "YES"
 
 ``` r
-maxdeaths %>% 
-  ungroup() %>% 
-  count(Died, total_death)
+total_deaths <- deaths %>%
+  filter(tolower(Died) == "yes") %>%
+  nrow()
 ```
 
-    ## # A tibble: 6 × 3
-    ##   Died  total_death     n
-    ##   <chr>       <dbl> <int>
-    ## 1 NO              1   104
-    ## 2 NO              2     1
-    ## 3 YES             1    53
-    ## 4 YES             2    14
-    ## 5 YES             3     1
-    ## 6 YES             5     1
+Get the data into a format where the five columns for Death\[1-5\] are
+replaced by two columns: Time, and Death. Time should be a number
+between 1 and 5 (look into the function `parse_number`); Death is a
+categorical variables with values “yes”, “no” and ““. Call the resulting
+data set `deaths`.
 
-``` r
-maxdeaths %>%
-  group_by(Died, total_death) %>%
-  tally()
-```
+Similarly, deal with the returns of characters.
 
-    ## # A tibble: 6 × 3
-    ## # Groups:   Died [2]
-    ##   Died  total_death     n
-    ##   <chr>       <dbl> <int>
-    ## 1 NO              1   104
-    ## 2 NO              2     1
-    ## 3 YES             1    53
-    ## 4 YES             2    14
-    ## 5 YES             3     1
-    ## 6 YES             5     1
+Based on these datasets calculate the average number of deaths an
+Avenger suffers.
+
+The average death an avenger suffers is 0.5229, assuming we treat the
+Died=NO and total_death=1 as 0 deaths. However, if you just average the
+results from the maxdeaths (let the Died=NO and total_death=1 stay as 1
+death) table you get 1.12069.
+
+## Individually
+
+For each team member, copy this part of the report.
+
+Each team member picks one of the statements in the FiveThirtyEight
+[analysis](https://fivethirtyeight.com/features/avengers-death-comics-age-of-ultron/)
+and fact checks it based on the data. Use dplyr functionality whenever
+possible.
+
+### FiveThirtyEight Statement
+
+> Quote the statement you are planning to fact-check. Questions we can
+> pick from 2. “Jocasta — an android based on Janet van Dyne and built
+> by Ultron — has been destroyed five times and then recovered five
+> times.” 3. “On 57 occasions the individual made a comeback.”
+
+Tirmidi Mohamed: Question: “I counted 89 total deaths.”
+
+### Include the code
+
+Make sure to include the code to derive the (numeric) fact for the
+statement
+
+Tirmidi’s code -
 
 ``` r
 total_deaths <- deaths %>%
@@ -128,45 +139,31 @@ total_deaths
 
     ## [1] 89
 
+Megan’s code - Out of 173 listed Avengers, my analysis found that 69 had
+died at least one time after they joined the team.
 
-    Get the data into a format where the five columns for Death[1-5] are replaced by two columns: Time, and Death. Time should be a number between 1 and 5 (look into the function `parse_number`); Death is a categorical variables with values "yes", "no" and "". Call the resulting data set `deaths`. 
+``` r
+at_least_once <- deaths %>%
+  mutate(
+    Time = parse_number(Time)
+  ) %>% 
+  group_by(URL, Died) %>% 
+  summarise(
+    total_death = max(Time)
+  ) %>%
+  filter(Died != "") %>%
+  filter(Died == "YES") %>%
+  nrow()
+```
 
-    Similarly, deal with the returns of characters.
+    ## `summarise()` has grouped output by 'URL'. You can override using the `.groups`
+    ## argument.
 
-    Based on these datasets calculate the average number of deaths an Avenger suffers. 
+``` r
+at_least_once
+```
 
-    ## Individually
-
-    For each team member, copy this part of the report. 
-
-    Each team member picks one of the statements in the FiveThirtyEight [analysis](https://fivethirtyeight.com/features/avengers-death-comics-age-of-ultron/) and fact checks it based on the data. Use dplyr functionality whenever possible.
-
-    ### FiveThirtyEight Statement
-
-    > Quote the statement you are planning to fact-check.
-    Questions we can pick from 
-    1. "Out of 173 listed Avengers, my analysis found that 69 had died at least one time after they joined the team."
-    2. "Jocasta — an android based on Janet van Dyne and built by Ultron — has been destroyed five times and then recovered five times."
-    3. "On 57 occasions the individual made a comeback."
-
-    Tirmidi Mohamed: Question: "I counted 89 total deaths."
-
-    ### Include the code
-
-    Make sure to include the code to derive the (numeric) fact for the statement
-
-    Tirmidi's code -
-
-    ``` r
-    total_deaths <- deaths %>%
-      filter(tolower(Died) == "yes") %>%
-      nrow()
-
-    total_deaths
-
-    ## [1] 89
-
-Next students code -
+    ## [1] 69
 
 Next students code -
 
@@ -178,6 +175,13 @@ Include at least one sentence discussing the result of your
 fact-checking endeavor. **Tirmidi’s answer** - The statement that there
 were a total of 89 deaths is true. I was able to check by tallying up
 all the yes for deaths and it adds up to 89 so this is true.
+
+**Megan’s answer** - The print statement shows that the number of
+avengers who have died at least once is equal to 69. I used the deaths
+table, calculated the total deaths similar to the maxdeaths table, and
+filtered if they had died or not. Each row represents a unique avenger
+who has died, so the count of rows, which is 69, proves that 69 avengers
+died at least once.
 
 Upload your changes to the repository. Discuss and refine answers as a
 team.
