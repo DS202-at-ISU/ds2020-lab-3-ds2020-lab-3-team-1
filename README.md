@@ -28,6 +28,14 @@ Extract from the data below two data sets in long form `deaths` and
 library(tidyverse)
 ```
 
+    ## Warning: package 'tidyverse' was built under R version 4.4.2
+
+    ## Warning: package 'readr' was built under R version 4.4.2
+
+    ## Warning: package 'forcats' was built under R version 4.4.2
+
+    ## Warning: package 'lubridate' was built under R version 4.4.2
+
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
     ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
@@ -94,7 +102,131 @@ between 1 and 5 (look into the function `parse_number`); Death is a
 categorical variables with values “yes”, “no” and ““. Call the resulting
 data set `deaths`.
 
+``` r
+average_deaths <- deaths %>%
+  mutate(
+    Time = parse_number(Time)
+  ) %>% 
+  group_by(URL, Died) %>% 
+  summarise(
+    total_death = max(Time)
+  ) %>% 
+  filter(Died != "") %>%
+  ungroup() %>% 
+  mutate(
+    total_death = if_else(Died == "NO" & total_death == 1, 0, total_death) #Sets the people who never died to 0 deaths
+  ) %>%
+  summarise(
+    average_total_death = mean(total_death, na.rm = TRUE)
+  ) %>%
+  pull(average_total_death) # Extract the value
+```
+
+    ## `summarise()` has grouped output by 'URL'. You can override using the `.groups`
+    ## argument.
+
+``` r
+print(average_deaths)
+```
+
+    ## [1] 0.5229885
+
+``` r
+maxdeaths <- deaths %>% 
+  mutate(
+    Time = parse_number(Time)
+  ) %>% 
+  group_by(URL, Died) %>% 
+  summarise(
+    total_death = max(Time)
+  ) %>%
+  filter(Died != "")
+```
+
+    ## `summarise()` has grouped output by 'URL'. You can override using the `.groups`
+    ## argument.
+
+``` r
+maxdeaths %>% 
+  ungroup() %>% 
+  count(Died, total_death)
+```
+
+    ## # A tibble: 6 × 3
+    ##   Died  total_death     n
+    ##   <chr>       <dbl> <int>
+    ## 1 NO              1   104
+    ## 2 NO              2     1
+    ## 3 YES             1    53
+    ## 4 YES             2    14
+    ## 5 YES             3     1
+    ## 6 YES             5     1
+
+``` r
+grouped_deaths <- maxdeaths %>%
+  group_by(Died, total_death) %>%
+  tally()
+```
+
 Similarly, deal with the returns of characters.
+
+``` r
+returns <- av %>% 
+  pivot_longer(
+    starts_with("Return"),
+    names_to = "TimeReturned",
+    values_to = "Returned"
+  ) %>%
+  select(
+    URL, Name.Alias, TimeReturned, Returned,
+  )
+
+maxreturns <- returns %>% 
+  mutate(
+    TimeReturned = parse_number(TimeReturned)
+  ) %>% 
+  group_by(URL, Returned) %>% 
+  summarise(
+    total_return = max(TimeReturned)
+  ) %>%
+  filter(Returned != "")
+```
+
+    ## `summarise()` has grouped output by 'URL'. You can override using the `.groups`
+    ## argument.
+
+``` r
+maxreturns %>% 
+  ungroup() %>% 
+  count(Returned, total_return)
+```
+
+    ## # A tibble: 6 × 3
+    ##   Returned total_return     n
+    ##   <chr>           <dbl> <int>
+    ## 1 NO                  1    23
+    ## 2 NO                  2     8
+    ## 3 NO                  3     1
+    ## 4 YES                 1    38
+    ## 5 YES                 2     7
+    ## 6 YES                 5     1
+
+``` r
+maxreturns %>%
+  group_by(Returned, total_return) %>%
+  tally()
+```
+
+    ## # A tibble: 6 × 3
+    ## # Groups:   Returned [2]
+    ##   Returned total_return     n
+    ##   <chr>           <dbl> <int>
+    ## 1 NO                  1    23
+    ## 2 NO                  2     8
+    ## 3 NO                  3     1
+    ## 4 YES                 1    38
+    ## 5 YES                 2     7
+    ## 6 YES                 5     1
 
 Based on these datasets calculate the average number of deaths an
 Avenger suffers.
@@ -165,7 +297,59 @@ at_least_once
 
     ## [1] 69
 
-Next students code -
+Ryan Jensen’s code - There’s a 2-in-3 chance that a member of the
+Avengers returned from their first stint in the afterlife, but only a 50
+percent chance they recovered from a second or third death.8
+
+``` r
+died_once <- deaths %>% 
+  mutate(
+    Time = parse_number(Time)
+  ) %>% 
+  filter(Time == 1,
+         Died == "YES") %>% 
+  nrow()
+died_once
+```
+
+    ## [1] 69
+
+``` r
+died_Two_or_Three <- deaths %>% 
+  mutate(
+    Time = parse_number(Time)
+  ) %>% 
+  filter(Time == 2 | Time == 3,
+         Died == "YES") %>% 
+  nrow()
+died_Two_or_Three
+```
+
+    ## [1] 18
+
+``` r
+one_return <- returns %>%
+  mutate(
+    return = parse_number(TimeReturned)
+  ) %>%
+  filter(Returned == "YES", return == 1) %>%
+  nrow()
+one_return
+```
+
+    ## [1] 46
+
+``` r
+two_or_three_return <- returns %>%
+  mutate(
+    return = parse_number(TimeReturned)
+  ) %>%
+  filter(Returned == "YES", return == 2 | return == 3) %>%
+  nrow()
+two_or_three_return
+```
+
+    ## [1] 9
 
 Next students code -
 
@@ -182,6 +366,11 @@ table, calculated the total deaths similar to the maxdeaths table, and
 filtered if they had died or not. Each row represents a unique avenger
 who has died, so the count of rows, which is 69, proves that 69 avengers
 died at least once.
+
+**Ryan’s answer** Out of the 69 Avengers that died once, 46 returned
+from that death leaving a return rate of 46/69 = 2/3. Out of the 18
+avengers that died two or three times, 9 of them returned leaving a
+return rate of 9/18 = 1/2.
 
 Upload your changes to the repository. Discuss and refine answers as a
 team.

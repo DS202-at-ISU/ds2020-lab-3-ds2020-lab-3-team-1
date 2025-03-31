@@ -184,10 +184,45 @@ at_least_once
 
 ```
 
-Next students code - 
+Ryan Jensen's code - There’s a 2-in-3 chance that a member of the Avengers returned from their first stint in the afterlife, but only a 50 percent chance they recovered from a second or third death
 
 ```{r}
+died_once <- deaths %>% 
+  mutate(
+    Time = parse_number(Time)
+  ) %>% 
+  filter(Time == 1,
+         Died == "YES") %>% 
+  nrow()
+died_once
 
+died_Two_or_Three <- deaths %>% 
+  mutate(
+    Time = parse_number(Time)
+  ) %>% 
+  filter(Time == 2 | Time == 3,
+         Died == "YES") %>% 
+  nrow()
+died_Two_or_Three
+
+
+one_return <- returns %>%
+  mutate(
+    return = parse_number(TimeReturned)
+  ) %>%
+  filter(Returned == "YES", return == 1) %>%
+  nrow()
+one_return
+
+two_or_three_return <- returns %>%
+  mutate(
+    return = parse_number(TimeReturned)
+  ) %>%
+  filter(Returned == "YES", return == 2 | return == 3) %>%
+  nrow()
+two_or_three_return
+
+  
 ```
 Next students code -
 
@@ -202,5 +237,8 @@ Include at least one sentence discussing the result of your fact-checking endeav
  
 **Megan's answer**
  - The print statement shows that the number of avengers who have died at least once is equal to 69. I used the deaths table, calculated the total deaths similar to the maxdeaths table, and filtered if they had died or not. Each row represents a unique avenger who has died, so the count of rows, which is 69, proves that 69 avengers died at least once.
+ 
+**Ryan's answer**
+Out of the 69 Avengers that died once, 46 returned from that death leaving a return rate of 46/69 = 2/3. Out of the 18 avengers that died two or three times, 9 of them returned leaving a return rate of 9/18 = 1/2.
 
 Upload your changes to the repository. Discuss and refine answers as a team.
